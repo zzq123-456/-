@@ -1,0 +1,451 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分奖励表</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background-color: #4CAF50;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .nav button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        .nav button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .nav button.active {
+            background-color: white;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .page {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .page.active {
+            display: block;
+        }
+        .category {
+            margin-bottom: 20px;
+        }
+        .category-title {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .deduct .item button {
+            background-color: #f44336;
+        }
+        .redeem .item button {
+            background-color: #2196F3;
+        }
+        .score-display {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .day-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .day-selector button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        .day-selector button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>积分奖励表</h1>
+        </div>
+        
+        <div class="score-display" id="scoreDisplay">
+            总分: <span id="totalScore">0</span>
+        </div>
+        
+        <div class="nav">
+            <button class="active" onclick="showPage('addPage')">加分项目</button>
+            <button onclick="showPage('deductPage')">扣分项目</button>
+            <button onclick="showPage('redeemPage')">兑换奖励</button>
+        </div>
+        
+        <div class="day-selector">
+            <button onclick="changeDay(0)" class="active">周一</button>
+            <button onclick="changeDay(1)">周二</button>
+            <button onclick="changeDay(2)">周三</button>
+            <button onclick="changeDay(3)">周四</button>
+            <button onclick="changeDay(4)">周五</button>
+            <button onclick="changeDay(5)">周六</button>
+            <button onclick="changeDay(6)">周日</button>
+            <button onclick="showWeeklyTotal()">周末统计</button>
+        </div>
+        
+        <!-- 加分项目页面 -->
+        <div id="addPage" class="page active">
+            <div class="category">
+                <div class="category-title">学习习惯</div>
+                <div class="items">
+                    <div class="item">认真完成各科作业<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">预习明日要学<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">复习今日所学内容<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">每日练字15分钟<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">坐姿、握笔姿势标准<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">课外书阅读30分钟<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">手机电脑用完主动上交<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">先做后玩不随便离开<button onclick="addScore(3)">+3</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">学习科目</div>
+                <div class="items">
+                    <div class="item">口算题50道<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">阅读理解1篇<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">看图写话1篇<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">英语听力1篇<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">计算题10道（笔算）<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">英语单词读写5个<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">英语口语练习5分钟<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">每日练字<button onclick="addScore(5)">+5</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">学习成绩</div>
+                <div class="items">
+                    <div class="item">单元测试95分以上<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">获得学校的奖状<button onclick="addScore(10)">+10</button></div>
+                    <div class="item">课堂听写、默写全对<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">被老师表扬<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">学科奖状<button onclick="addScore(4)">+4</button></div>
+                    <div class="item">参加文体活动<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">某科目考试进步<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">考试科目测试优秀<button onclick="addScore(2)">+2</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">生活习惯</div>
+                <div class="items">
+                    <div class="item">按时睡觉、起床<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">整理书包、课桌<button onclick="addScore(1)">+1</button></div>
+                    <div class="item">吃饭文明、不挑食<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">主动做家务<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">主动洗漱<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">照顾弟弟/妹妹<button onclick="addScore(2)">+2</button></div>
+                    <div class="item">每日运动30分钟<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">个人卫生好<button onclick="addScore(3)">+3</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">性格养成</div>
+                <div class="items">
+                    <div class="item">一天不发脾气<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">主动和认识的人打招呼<button onclick="addScore(4)">+4</button></div>
+                     <div class="item">公共场合不大声喧哗<button onclick="addScore(3)">+3</button></div>
+                    <div class="item">遇到难题想办法解决<button onclick="addScore(4)">+4</button></div>
+                    <div class="item">遇到失败不赌气<button onclick="addScore(5)">+5</button></div>
+                    <div class="item">不和长辈顶嘴<button onclick="addScore(3)">+3</button></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 扣分项目页面 -->
+        <div id="deductPage" class="page">
+            <div class="category">
+                <div class="category-title">学习习惯</div>
+                <div class="items">
+                    <div class="item">未认真完成作业<button onclick="deductScore(5)">-5</button></div>
+                    <div class="item">没复习今日所学<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">没预习明日课程<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">没进行每日练字<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">坐姿握笔不标准<button onclick="deductScore(1)">-1</button></div>
+                    <div class="item">没进行课外阅读<button onclick="deductScore(2)">-2</button></div>
+                    
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">生活习惯问题</div>
+                <div class="items">
+                    <div class="item">起床、睡觉拖延<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">不讲卫生、房间脏乱<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">不主动洗漱<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">不整理书包、课桌<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">看电视手机超过20分钟<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">没完成运动、锻炼任务<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">吃饭时间超过20分钟<button onclick="deductScore(2)">-2</button></div>
+                    <div class="item">吃饭挑食浪费<button onclick="deductScore(2)">-2</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">行为品质</div>
+                <div class="items">
+                    <div class="item">顶撞父母<button onclick="deductScore(5)">-5</button></div>
+                    <div class="item">欺负他人<button onclick="deductScore(4)">-4</button></div>
+                    <div class="item">说谎<button onclick="deductScore(4)">-4</button></div>
+                    <div class="item">乱发脾气<button onclick="deductScore(3)">-3</button></div>
+                    <div class="item">说脏话<button onclick="deductScore(3)">-3</button></div>
+                    <div class="item">与人打架<button onclick="deductScore(4)">-4</button></div>
+                    <div class="item">偷买零食、垃圾食品<button onclick="deductScore(3)">-3</button></div>
+                    <div class="item">危险行为<button onclick="deductScore(8)">-8</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">学习成绩</div>
+                <div class="items">
+                    <div class="item">单元测试不优秀<button onclick="deductScore(3)">-3</button></div>
+                    <div class="item">单元测试70分以下<button onclick="deductScore(4)">-4</button></div>
+                    <div class="item">单元测试不及格<button onclick="deductScore(5)">-5</button></div>
+                    <div class="item">被老师点名批评<button onclick="deductScore(10)">-10</button></div>
+                    <div class="item">表现差、老师找家长<button onclick="deductScore(15)">-15</button></div>
+                   
+                </div>
+            </div>
+        </div>
+        
+        <!-- 兑换奖励页面 -->
+        <div id="redeemPage" class="page">
+            <div class="category">
+                <div class="category-title">小奖励</div>
+                <div class="items">
+                    <div class="item">看电视30分钟<button onclick="redeemReward(10)">-10</button></div>
+                    <div class="item">玩电子游戏15分钟<button onclick="redeemReward(15)">-15</button></div>
+                    <div class="item">小零食一份<button onclick="redeemReward(5)">-5</button></div>
+                    <div class="item">选择晚餐菜品<button onclick="redeemReward(8)">-8</button></div>
+                    <div class="item">晚睡30分钟<button onclick="redeemReward(12)">-12</button></div>
+                    <div class="item">选择周末活动<button onclick="redeemReward(20)">-20</button></div>
+                    <div class="item">新铅笔一支<button onclick="redeemReward(10)">-10</button></div>
+                    <div class="item">贴纸一张<button onclick="redeemReward(5)">-5</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">中奖励</div>
+                <div class="items">
+                    <div class="item">新书一本<button onclick="redeemReward(30)">-30</button></div>
+                    <div class="item">玩具一个<button onclick="redeemReward(40)">-40</button></div>
+                    <div class="item">外出就餐<button onclick="redeemReward(35)">-35</button></div>
+                    <div class="item">电影票一张<button onclick="redeemReward(25)">-25</button></div>
+                    <div class="item">游乐场游玩<button onclick="redeemReward(50)">-50</button></div>
+                    <div class="item">新文具一套<button onclick="redeemReward(30)">-30</button></div>
+                    <div class="item">朋友来家玩<button onclick="redeemReward(25)">-25</button></div>
+                    <div class="item">选择周末旅行地点<button onclick="redeemReward(45)">-45</button></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-title">大奖励</div>
+                <div class="items">
+                    <div class="item">新运动鞋一双<button onclick="redeemReward(200)">-200</button></div>
+                    <div class="item">大型拼装玩具<button onclick="redeemReward(300)">-300</button></div>
+                    
+                    <div class="item">主题公园一日游<button onclick="redeemReward(150)">-150</button></div>
+                    <div class="item">夏令营报名<button onclick="redeemReward(250)">-250</button></div>
+                    <div class="item">宠物一只<button onclick="redeemReward(350)">-350</button></div>
+                    
+                    <div class="item">家庭旅行决定权<button onclick="redeemReward(300)">-300</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        let scores = {
+            mon: 0,
+            tue: 0,
+            wed: 0,
+            thu: 0,
+            fri: 0,
+            sat: 0,
+            sun: 0
+        };
+        
+        let currentDay = 'mon';
+        const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        const dayNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        
+        // 从本地存储加载数据
+        function loadData() {
+            const savedData = localStorage.getItem('rewardSystemData');
+            if (savedData) {
+                scores = JSON.parse(savedData);
+                updateScoreDisplay();
+            }
+        }
+        
+        // 保存数据到本地存储
+        function saveData() {
+            localStorage.setItem('rewardSystemData', JSON.stringify(scores));
+        }
+        
+        // 显示页面
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 改变当前日期
+        function changeDay(dayIndex) {
+            currentDay = days[dayIndex];
+            updateScoreDisplay();
+            
+            document.querySelectorAll('.day-selector button').forEach((btn, idx) => {
+                if (idx === dayIndex) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // 添加分数
+        function addScore(points) {
+            scores[currentDay] += points;
+            updateScoreDisplay();
+            saveData();
+        }
+        
+        // 扣除分数
+        function deductScore(points) {
+            scores[currentDay] -= points;
+            updateScoreDisplay();
+            saveData();
+        }
+        
+        // 兑换奖励
+        function redeemReward(points) {
+            if (confirm(`确定要兑换这个奖励吗? 将扣除 ${points} 分。`)) {
+                if (getTotalScore() >= points) {
+                    // 从最近有分数的日期开始扣除
+                    for (let i = days.length - 1; i >= 0; i--) {
+                        const day = days[i];
+                        if (scores[day] > 0) {
+                            const deductAmount = Math.min(scores[day], points);
+                            scores[day] -= deductAmount;
+                            points -= deductAmount;
+                            
+                            if (points === 0) break;
+                        }
+                    }
+                    updateScoreDisplay();
+                    saveData();
+                    alert('兑换成功!');
+                } else {
+                    alert('积分不足，无法兑换此奖励!');
+                }
+            }
+        }
+        
+        // 计算总分
+        function getTotalScore() {
+            return Object.values(scores).reduce((sum, score) => sum + score, 0);
+        }
+        
+        // 更新分数显示
+        function updateScoreDisplay() {
+            document.getElementById('totalScore').textContent = getTotalScore();
+            document.querySelector('.score-display').innerHTML = `
+                总分: <span id="totalScore">${getTotalScore()}</span><br>
+                ${dayNames[days.indexOf(currentDay)]}: ${scores[currentDay]}
+            `;
+        }
+        
+        // 显示周末统计
+        function showWeeklyTotal() {
+            const weeklyTotal = getTotalScore();
+            const weekdayTotal = days.slice(0, 5).reduce((sum, day) => sum + scores[day], 0);
+            const weekendTotal = days.slice(5).reduce((sum, day) => sum + scores[day], 0);
+            
+            alert(`本周统计:\n
+                周一至周五总分: ${weekdayTotal}\n
+                周末总分: ${weekendTotal}\n
+                本周总分: ${weeklyTotal}
+            `);
+        }
+        
+        // 初始化
+        window.onload = function() {
+            loadData();
+            updateScoreDisplay();
+        };
+    </script>
+</body>
+</html>
